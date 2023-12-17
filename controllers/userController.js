@@ -62,6 +62,50 @@ class UserController {
       res.status(500).json({ error: 'Terjadi kesalahan saat login' });
     }
   }
+
+  async getProfile(req, res) {
+    const userId = req.userId;
+
+    try {
+      const user = await userModel.getUserById(userId);
+
+      if (!user) {
+        return res.status(404).json({ error: 'User tidak ditemukan' });
+      }
+
+      res.json({ userData: user });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Terjadi kesalahan saat mengambil profil' });
+    }
+  }
+
+  async updateProfile(req, res) {
+    const userId = req.userId; 
+    const { nama, nomor_induk } = req.body;
+
+    if (!nama || !nomor_induk) {
+      return res.status(400).json({ error: 'Semua field harus diisi' });
+    }
+
+    try {
+      const currentUser = await userModel.getUserById(userId);
+      if (!currentUser) {
+        return res.status(404).json({ error: 'User tidak ditemukan' });
+      }
+
+      
+      await userModel.updateUser(userId, {
+        nama,
+        nomor_induk,
+      });
+
+      res.json({ message: 'Profil berhasil diperbarui' });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Terjadi kesalahan saat memperbarui profil' });
+    }
+  }
 }
 
 module.exports = new UserController();
