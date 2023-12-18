@@ -5,8 +5,8 @@ class UserModel {
     this.collection = admin.firestore().collection('users');
   }
 
-  async findByNomorInduk(nomorInduk) {
-    const query = await this.collection.where('nomor_induk', '==', nomorInduk).limit(1).get();
+  async findByNIP(NIP) {
+    const query = await this.collection.where('nip', '==', NIP).limit(1).get();
     return query.docs[0] ? query.docs[0].data() : null;
   }
 

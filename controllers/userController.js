@@ -3,15 +3,15 @@ const userModel = require('../models/userModel');
 
 class UserController {
   async register(req, res) {
-    const { nama, nomor_induk, email, password } = req.body;
+    const { nama, nip, email, password } = req.body;
 
-    if (!nama || !nomor_induk || !email || !password) {
+    if (!nama || !nip || !email || !password) {
       return res.status(400).json({ error: 'Semua field harus diisi' });
     }
 
     try {
-      const existingNomorInduk = await userModel.findByNomorInduk(nomor_induk);
-      if (existingNomorInduk) {
+      const existingNIP = await userModel.findByNIP(nip);
+      if (existingNIP) {
         return res.status(400).json({ error: 'Nomor induk sudah terdaftar' });
       }
 
@@ -24,7 +24,7 @@ class UserController {
 
       const userId = await userModel.addUser({
         nama,
-        nomor_induk,
+        nip,
         email,
         password: hashedPassword,
       });
@@ -82,9 +82,9 @@ class UserController {
 
   async updateProfile(req, res) {
     const userId = req.userId; 
-    const { nama, nomor_induk } = req.body;
+    const { nama, nip } = req.body;
 
-    if (!nama || !nomor_induk) {
+    if (!nama || !nip) {
       return res.status(400).json({ error: 'Semua field harus diisi' });
     }
 
@@ -97,7 +97,7 @@ class UserController {
       
       await userModel.updateUser(userId, {
         nama,
-        nomor_induk,
+        nip,
       });
 
       res.json({ message: 'Profil berhasil diperbarui' });
