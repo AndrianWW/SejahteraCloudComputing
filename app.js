@@ -9,7 +9,11 @@ app.use(bodyParser.json());
 
 app.use('/user', userRoutes);
 
-const port = 3000;
+app.get('/', (req, res) => {
+  res.send('welcome to sejahtera app')
+});
+
+const port = 5000;
 app.listen(port, () => {
   console.log(`Server berjalan di http://localhost:${port}`);
 });

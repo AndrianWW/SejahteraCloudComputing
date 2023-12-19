@@ -14,6 +14,15 @@ class UserModel {
     const query = await this.collection.where('email', '==', email).limit(1).get();
     return query.docs[0] ? query.docs[0].data() : null;
   }
+  
+  async getUserById(userId) {
+    const document = await this.collection.doc(userId).get();
+    return document.exists ? document.data() : null;
+  }
+
+  async updateUser(userId, newData) {
+    await this.collection.doc(userId).update(newData);
+  }
 
   async addUser(user) {
     const newUser = await this.collection.add(user);

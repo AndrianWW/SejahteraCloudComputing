@@ -9,7 +9,7 @@ router.post('/login', userController.login);
 
 router.use(authMiddleware);
 
-router.get('/profile', authMiddleware, userController.getProfile); 
-router.put('/profile', authMiddleware, userController.updateProfile);
+router.get('/:userId', authMiddleware, userController.getProfile); 
+router.put('/:userId', authMiddleware, userController.updateProfile);
 
 module.exports = router;

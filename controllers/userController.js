@@ -1,9 +1,11 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const userModel = require('../models/userModel');
 
 class UserController {
   async register(req, res) {
     const { nama, nip, email, password } = req.body;
+    console.log('Received request body:', req.body);
 
     if (!nama || !nip || !email || !password) {
       return res.status(400).json({ error: 'Semua field harus diisi' });
@@ -12,7 +14,7 @@ class UserController {
     try {
       const existingNIP = await userModel.findByNIP(nip);
       if (existingNIP) {
-        return res.status(400).json({ error: 'Nomor induk sudah terdaftar' });
+        return res.status(400).json({ error: 'Nomor induk pegawai sudah terdaftar' });
       }
 
       const existingEmail = await userModel.findByEmail(email);
@@ -29,7 +31,8 @@ class UserController {
         password: hashedPassword,
       });
 
-      res.json({ message: 'Registrasi berhasil', userId });
+      const token = jwt.sign({ userId }, process.env.JWT_SECRET_KEY || 'default-secret-key');
+      res.json({ message: 'Registrasi berhasil', userId, token });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Terjadi kesalahan saat registrasi' });
@@ -56,7 +59,8 @@ class UserController {
         return res.status(401).json({ error: 'Password salah' });
       }
 
-      res.json({ message: 'Login berhasil', userData: user });
+      const token = jwt.sign({ userId: user.userId }, process.env.JWT_SECRET_KEY || 'default-secret-key');      
+      res.json({ message: 'Login berhasil', userData: user, token });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Terjadi kesalahan saat login' });
@@ -64,8 +68,7 @@ class UserController {
   }
 
   async getProfile(req, res) {
-    const userId = req.userId;
-
+    const userId = req.params.userId;
     try {
       const user = await userModel.getUserById(userId);
 
@@ -81,7 +84,7 @@ class UserController {
   }
 
   async updateProfile(req, res) {
-    const userId = req.userId; 
+    const userId = req.params.userId; 
     const { nama, nip } = req.body;
 
     if (!nama || !nip) {
