@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const userModel = require('../models/userModel');
+const modelPredictions = require('../models/modelPredictions');
 
 class UserController {
   async register(req, res) {
@@ -107,6 +108,20 @@ class UserController {
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Terjadi kesalahan saat memperbarui profil' });
+    }
+  }
+
+  async makePrediction(req, res) {
+    const modelName = req.params.modelName;
+    const instances = req.body.instances;
+
+    try {
+      const predictions = await modelPredictions.predictModel(instances, modelName);
+
+      res.json({ modelName, predictions });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error making prediction' });
     }
   }
 }

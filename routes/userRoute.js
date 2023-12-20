@@ -9,6 +9,8 @@ router.post('/login', userController.login);
 
 router.use(authMiddleware);
 
+router.post('/predict/:modelName', authMiddleware, userController.makePrediction);
+
 router.get('/:userId', authMiddleware, userController.getProfile); 
 router.put('/:userId', authMiddleware, userController.updateProfile);
 
