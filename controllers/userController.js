@@ -3,6 +3,7 @@ const { admin } = require('../firebase');
 const { firebaseAuth } = require('../firebase');
 const userModel = require('../models/userModel');
 const modelPredictions = require('../models/modelPredictions');
+const { refreshToken } = require('firebase-admin/app');
 
 class UserController {
   async register(req, res) {
@@ -72,12 +73,21 @@ class UserController {
     }
 
     try {     
-      // Sign in the user with email and password
-      const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
-      // const userCredential = await admin.auth().signInWithEmailAndPassword(email, password);
+      const userRecord = await firebaseAuth.getUserByEmail(email);
 
-      // Extract the user record from the userCredential
-      const userRecord = userCredential.user;
+      // Validate the provided password
+      // const isPasswordValid = await validatePassword(password, userRecord);
+
+      // if (!isPasswordValid) {
+      //   res.status(401).json({ error: 'password salah' });
+      //   return;
+      // }      
+
+      // const passwordMatch = await bcrypt.compare(password, userRecord.password);
+
+      // if (!passwordMatch) {
+      //   return res.status(401).json({ error: 'Password salah' });
+      // }
 
       // Sign in the user with email and password
       // const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
@@ -85,14 +95,18 @@ class UserController {
       // Extract the user record from the userCredential
       // const userRecord = userCredential.user;
 
-      const token = await userRecord.getIdToken();
-      res.json({ message: 'Login berhasil', userId: userRecord.uid, token });
+      // const token = await userRecord.getIdToken(refreshToken);
+      // const idToken = await userRecord.getIdToken();
+      res.json({ message: 'Login berhasil', userId: userRecord.uid });
+      // res.json({ message: 'Login berhasil', userId: userRecord.uid, token });
     } catch (error) {
       console.error(error);
 
       // Handle authentication errors
       if (error.code === 'auth/user-not-found') {
         return res.status(401).json({ error: 'Email tidak terdaftar' });
+      } else if (error.code === 'auth/invalid-email') {
+        return res.status(401).json({ error: 'Format email salah' });
       } else if (error.code === 'auth/wrong-password') {
         return res.status(401).json({ error: 'Password salah' });
       }
