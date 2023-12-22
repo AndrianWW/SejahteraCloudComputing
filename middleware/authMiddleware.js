@@ -1,29 +1,20 @@
-const jwt = require('jsonwebtoken');
+const { admin } = require('../firebase');
 
-module.exports = function authMiddleware(req, res, next) {
-  const { authorization } = req.headers;
+async function authMiddleware(req, res, next) {
+  const token = req.header('Authorization');
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Unauthorized: Missing or invalid token format' });
+  if (!token) {
+    return res.status(401).json({ error: 'Unauthorized - Missing token' });
   }
 
-  const token = authorization.split('Bearer ')[1];
-
   try {
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY || 'default-secret-key');
-    
-    req.user = { userId: decodedToken.userId };
-    
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    req.uid = decodedToken.uid;
     next();
   } catch (error) {
     console.error(error);
-
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Unauthorized: Token has expired' });
-    } else if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ error: 'Unauthorized: Invalid token' });
-    } else {
-      return res.status(401).json({ error: 'Unauthorized: Authentication failed' });
-    }
+    return res.status(401).json({ error: 'Unauthorized - Invalid token' });
   }
-};
+}
+
+module.exports = authMiddleware;

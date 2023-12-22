@@ -1,5 +1,6 @@
 const axios = require('axios');
 
+
 async function predictModel(instances, modelName) {
   let endpointId;
 
@@ -32,13 +33,17 @@ async function predictModel(instances, modelName) {
   try {
     const response = await axios.post(
       `https://asia-southeast2-aiplatform.googleapis.com/v1/projects/sejahtera-capstone-project/locations/asia-southeast2/endpoints/${endpointId}:predict`,
-      { instances }
+      { instances },
     );
 
     return response.data.predictions;
   } catch (error) {
-    console.error(error);
-    throw new Error('Error making prediction');
+    // console.error(error);
+    // console.error(`Error making prediction. Status Code: ${error.response.status}`);
+    console.error('Error making prediction. Status Code:', error.response.status);
+    console.error('Error details:', error.response.data);
+
+    // throw new Error('error juga nih',);
   }
 }
 
