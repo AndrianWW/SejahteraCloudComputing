@@ -8,7 +8,7 @@ router.post('/register', userController.register);
 router.post('/login', userController.login);
 
 
-// router.post('/predict/:modelName', authMiddleware, userController.makePrediction);
+router.post('/predict/:modelName', authMiddleware, userController.makePrediction);
 
 router.get('/profile/:userId', authMiddleware, userController.getProfile);
 router.put('/profile/:userId', authMiddleware, userController.updateProfile);

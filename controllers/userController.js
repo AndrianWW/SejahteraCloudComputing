@@ -107,9 +107,12 @@ class UserController {
         return res.status(401).json({ error: 'Email tidak terdaftar' });
       } else if (error.code === 'auth/invalid-email') {
         return res.status(401).json({ error: 'Format email salah' });
-      } else if (error.code === 'auth/wrong-password') {
+      } else {
         return res.status(401).json({ error: 'Password salah' });
       }
+      // } else if (error.code === 'auth/wrong-password') {
+      //   return res.status(401).json({ error: 'Password salah' });
+      // }
 
       res.status(500).json({ error: 'Terjadi kesalahan saat login' });
     }
